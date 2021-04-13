@@ -1,6 +1,3 @@
-[submodule "proj/digilent-vivado-scripts"]
-	path = proj/digilent-vivado-scripts
-	url = https://github.com/Digilent/digilent-vivado-scripts.git
 [submodule "digilent-vivado-scripts"]
 	path = digilent-vivado-scripts
 	url = https://github.com/Digilent/digilent-vivado-scripts.git
