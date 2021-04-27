@@ -127,6 +127,7 @@ if { $bCheckIPs == 1 } {
 xilinx.com:ip:axi_gpio:2.0\
 xilinx.com:ip:processing_system7:5.5\
 xilinx.com:ip:proc_sys_reset:5.0\
+xilinx.com:ip:system_ila:1.1\
 "
 
    set list_ips_missing ""
@@ -203,15 +204,8 @@ proc create_root_design { parentCell } {
 
   # Create ports
 
-  # Create instance: axi_gpio_0, and set properties
-  set axi_gpio_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 axi_gpio_0 ]
-  set_property -dict [ list \
-   CONFIG.GPIO_BOARD_INTERFACE {leds_4bits} \
-   CONFIG.USE_BOARD_FLOW {true} \
- ] $axi_gpio_0
-
-  # Create instance: axi_gpio_1, and set properties
-  set axi_gpio_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 axi_gpio_1 ]
+  # Create instance: btn_sw_gpio, and set properties
+  set btn_sw_gpio [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 btn_sw_gpio ]
   set_property -dict [ list \
    CONFIG.C_ALL_INPUTS {1} \
    CONFIG.C_GPIO_WIDTH {4} \
@@ -219,7 +213,14 @@ proc create_root_design { parentCell } {
    CONFIG.GPIO2_BOARD_INTERFACE {sws_4bits} \
    CONFIG.GPIO_BOARD_INTERFACE {btns_4bits} \
    CONFIG.USE_BOARD_FLOW {true} \
- ] $axi_gpio_1
+ ] $btn_sw_gpio
+
+  # Create instance: led_gpio, and set properties
+  set led_gpio [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 led_gpio ]
+  set_property -dict [ list \
+   CONFIG.GPIO_BOARD_INTERFACE {leds_4bits} \
+   CONFIG.USE_BOARD_FLOW {true} \
+ ] $led_gpio
 
   # Create instance: processing_system7_0, and set properties
   set processing_system7_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:processing_system7:5.5 processing_system7_0 ]
@@ -705,29 +706,51 @@ proc create_root_design { parentCell } {
   # Create instance: rst_ps7_0_50M, and set properties
   set rst_ps7_0_50M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_ps7_0_50M ]
 
+  # Create instance: system_ila_0, and set properties
+  set system_ila_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:system_ila:1.1 system_ila_0 ]
+  set_property -dict [ list \
+   CONFIG.C_MON_TYPE {INTERFACE} \
+   CONFIG.C_NUM_MONITOR_SLOTS {1} \
+   CONFIG.C_SLOT_0_APC_EN {0} \
+   CONFIG.C_SLOT_0_AXI_AR_SEL_DATA {1} \
+   CONFIG.C_SLOT_0_AXI_AR_SEL_TRIG {1} \
+   CONFIG.C_SLOT_0_AXI_AW_SEL_DATA {1} \
+   CONFIG.C_SLOT_0_AXI_AW_SEL_TRIG {1} \
+   CONFIG.C_SLOT_0_AXI_B_SEL_DATA {1} \
+   CONFIG.C_SLOT_0_AXI_B_SEL_TRIG {1} \
+   CONFIG.C_SLOT_0_AXI_R_SEL_DATA {1} \
+   CONFIG.C_SLOT_0_AXI_R_SEL_TRIG {1} \
+   CONFIG.C_SLOT_0_AXI_W_SEL_DATA {1} \
+   CONFIG.C_SLOT_0_AXI_W_SEL_TRIG {1} \
+   CONFIG.C_SLOT_0_INTF_TYPE {xilinx.com:interface:aximm_rtl:1.0} \
+ ] $system_ila_0
+
   # Create interface connections
-  connect_bd_intf_net -intf_net axi_gpio_0_GPIO [get_bd_intf_ports leds_4bits] [get_bd_intf_pins axi_gpio_0/GPIO]
-  connect_bd_intf_net -intf_net axi_gpio_1_GPIO [get_bd_intf_ports btns_4bits] [get_bd_intf_pins axi_gpio_1/GPIO]
-  connect_bd_intf_net -intf_net axi_gpio_1_GPIO2 [get_bd_intf_ports sws_4bits] [get_bd_intf_pins axi_gpio_1/GPIO2]
+  connect_bd_intf_net -intf_net axi_gpio_0_GPIO [get_bd_intf_ports leds_4bits] [get_bd_intf_pins led_gpio/GPIO]
+  connect_bd_intf_net -intf_net axi_gpio_1_GPIO [get_bd_intf_ports btns_4bits] [get_bd_intf_pins btn_sw_gpio/GPIO]
+  connect_bd_intf_net -intf_net axi_gpio_1_GPIO2 [get_bd_intf_ports sws_4bits] [get_bd_intf_pins btn_sw_gpio/GPIO2]
   connect_bd_intf_net -intf_net processing_system7_0_DDR [get_bd_intf_ports DDR] [get_bd_intf_pins processing_system7_0/DDR]
   connect_bd_intf_net -intf_net processing_system7_0_FIXED_IO [get_bd_intf_ports FIXED_IO] [get_bd_intf_pins processing_system7_0/FIXED_IO]
   connect_bd_intf_net -intf_net processing_system7_0_M_AXI_GP0 [get_bd_intf_pins processing_system7_0/M_AXI_GP0] [get_bd_intf_pins ps7_0_axi_periph/S00_AXI]
-  connect_bd_intf_net -intf_net ps7_0_axi_periph_M00_AXI [get_bd_intf_pins axi_gpio_0/S_AXI] [get_bd_intf_pins ps7_0_axi_periph/M00_AXI]
-  connect_bd_intf_net -intf_net ps7_0_axi_periph_M01_AXI [get_bd_intf_pins axi_gpio_1/S_AXI] [get_bd_intf_pins ps7_0_axi_periph/M01_AXI]
+  connect_bd_intf_net -intf_net ps7_0_axi_periph_M00_AXI [get_bd_intf_pins led_gpio/S_AXI] [get_bd_intf_pins ps7_0_axi_periph/M00_AXI]
+connect_bd_intf_net -intf_net [get_bd_intf_nets ps7_0_axi_periph_M00_AXI] [get_bd_intf_pins ps7_0_axi_periph/M00_AXI] [get_bd_intf_pins system_ila_0/SLOT_0_AXI]
+  set_property HDL_ATTRIBUTE.DEBUG {true} [get_bd_intf_nets ps7_0_axi_periph_M00_AXI]
+  connect_bd_intf_net -intf_net ps7_0_axi_periph_M01_AXI [get_bd_intf_pins btn_sw_gpio/S_AXI] [get_bd_intf_pins ps7_0_axi_periph/M01_AXI]
 
   # Create port connections
-  connect_bd_net -net processing_system7_0_FCLK_CLK0 [get_bd_pins axi_gpio_0/s_axi_aclk] [get_bd_pins axi_gpio_1/s_axi_aclk] [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins ps7_0_axi_periph/ACLK] [get_bd_pins ps7_0_axi_periph/M00_ACLK] [get_bd_pins ps7_0_axi_periph/M01_ACLK] [get_bd_pins ps7_0_axi_periph/S00_ACLK] [get_bd_pins rst_ps7_0_50M/slowest_sync_clk]
+  connect_bd_net -net processing_system7_0_FCLK_CLK0 [get_bd_pins btn_sw_gpio/s_axi_aclk] [get_bd_pins led_gpio/s_axi_aclk] [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins ps7_0_axi_periph/ACLK] [get_bd_pins ps7_0_axi_periph/M00_ACLK] [get_bd_pins ps7_0_axi_periph/M01_ACLK] [get_bd_pins ps7_0_axi_periph/S00_ACLK] [get_bd_pins rst_ps7_0_50M/slowest_sync_clk] [get_bd_pins system_ila_0/clk]
   connect_bd_net -net processing_system7_0_FCLK_RESET0_N [get_bd_pins processing_system7_0/FCLK_RESET0_N] [get_bd_pins rst_ps7_0_50M/ext_reset_in]
-  connect_bd_net -net rst_ps7_0_50M_peripheral_aresetn [get_bd_pins axi_gpio_0/s_axi_aresetn] [get_bd_pins axi_gpio_1/s_axi_aresetn] [get_bd_pins ps7_0_axi_periph/ARESETN] [get_bd_pins ps7_0_axi_periph/M00_ARESETN] [get_bd_pins ps7_0_axi_periph/M01_ARESETN] [get_bd_pins ps7_0_axi_periph/S00_ARESETN] [get_bd_pins rst_ps7_0_50M/peripheral_aresetn]
+  connect_bd_net -net rst_ps7_0_50M_peripheral_aresetn [get_bd_pins btn_sw_gpio/s_axi_aresetn] [get_bd_pins led_gpio/s_axi_aresetn] [get_bd_pins ps7_0_axi_periph/ARESETN] [get_bd_pins ps7_0_axi_periph/M00_ARESETN] [get_bd_pins ps7_0_axi_periph/M01_ARESETN] [get_bd_pins ps7_0_axi_periph/S00_ARESETN] [get_bd_pins rst_ps7_0_50M/peripheral_aresetn] [get_bd_pins system_ila_0/resetn]
 
   # Create address segments
-  assign_bd_address -offset 0x41200000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs axi_gpio_0/S_AXI/Reg] -force
-  assign_bd_address -offset 0x41210000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs axi_gpio_1/S_AXI/Reg] -force
+  assign_bd_address -offset 0x41200000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs led_gpio/S_AXI/Reg] -force
+  assign_bd_address -offset 0x41210000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs btn_sw_gpio/S_AXI/Reg] -force
 
 
   # Restore current instance
   current_bd_instance $oldCurInst
 
+  validate_bd_design
   save_bd_design
 }
 # End of create_root_design()
@@ -739,6 +762,4 @@ proc create_root_design { parentCell } {
 
 create_root_design ""
 
-
-common::send_gid_msg -ssname BD::TCL -id 2053 -severity "WARNING" "This Tcl script was generated from a block design that has not been validated. It is possible that design <$design_name> may result in errors during validation."
 
