@@ -204,10 +204,18 @@ proc create_root_design { parentCell } {
 
 
   # Create ports
+  set led6_b [ create_bd_port -dir O -from 0 -to 0 led6_b ]
+  set led6_g [ create_bd_port -dir O -from 0 -to 0 led6_g ]
   set led6_r [ create_bd_port -dir O -from 0 -to 0 led6_r ]
 
   # Create instance: axi_pwm_generator_0, and set properties
   set axi_pwm_generator_0 [ create_bd_cell -type ip -vlnv xilinx.com:user:axi_pwm_generator:1.0 axi_pwm_generator_0 ]
+
+  # Create instance: axi_pwm_generator_1, and set properties
+  set axi_pwm_generator_1 [ create_bd_cell -type ip -vlnv xilinx.com:user:axi_pwm_generator:1.0 axi_pwm_generator_1 ]
+
+  # Create instance: axi_pwm_generator_2, and set properties
+  set axi_pwm_generator_2 [ create_bd_cell -type ip -vlnv xilinx.com:user:axi_pwm_generator:1.0 axi_pwm_generator_2 ]
 
   # Create instance: btn_gpio_0, and set properties
   set btn_gpio_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 btn_gpio_0 ]
@@ -706,7 +714,7 @@ proc create_root_design { parentCell } {
   # Create instance: ps7_0_axi_periph, and set properties
   set ps7_0_axi_periph [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 ps7_0_axi_periph ]
   set_property -dict [ list \
-   CONFIG.NUM_MI {3} \
+   CONFIG.NUM_MI {5} \
  ] $ps7_0_axi_periph
 
   # Create instance: rst_ps7_0_50M, and set properties
@@ -743,17 +751,23 @@ proc create_root_design { parentCell } {
 connect_bd_intf_net -intf_net [get_bd_intf_nets ps7_0_axi_periph_M01_AXI] [get_bd_intf_pins ps7_0_axi_periph/M01_AXI] [get_bd_intf_pins system_ila_0/SLOT_0_AXI]
   set_property HDL_ATTRIBUTE.DEBUG {true} [get_bd_intf_nets ps7_0_axi_periph_M01_AXI]
   connect_bd_intf_net -intf_net ps7_0_axi_periph_M02_AXI [get_bd_intf_pins axi_pwm_generator_0/S00_AXI] [get_bd_intf_pins ps7_0_axi_periph/M02_AXI]
+  connect_bd_intf_net -intf_net ps7_0_axi_periph_M03_AXI [get_bd_intf_pins axi_pwm_generator_1/S00_AXI] [get_bd_intf_pins ps7_0_axi_periph/M03_AXI]
+  connect_bd_intf_net -intf_net ps7_0_axi_periph_M04_AXI [get_bd_intf_pins axi_pwm_generator_2/S00_AXI] [get_bd_intf_pins ps7_0_axi_periph/M04_AXI]
 
   # Create port connections
   connect_bd_net -net axi_pwm_generator_0_pwm_out [get_bd_ports led6_r] [get_bd_pins axi_pwm_generator_0/pwm_out]
-  connect_bd_net -net processing_system7_0_FCLK_CLK0 [get_bd_pins axi_pwm_generator_0/s00_axi_aclk] [get_bd_pins btn_gpio_0/s_axi_aclk] [get_bd_pins led_gpio_1/s_axi_aclk] [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins ps7_0_axi_periph/ACLK] [get_bd_pins ps7_0_axi_periph/M00_ACLK] [get_bd_pins ps7_0_axi_periph/M01_ACLK] [get_bd_pins ps7_0_axi_periph/M02_ACLK] [get_bd_pins ps7_0_axi_periph/S00_ACLK] [get_bd_pins rst_ps7_0_50M/slowest_sync_clk] [get_bd_pins system_ila_0/clk]
+  connect_bd_net -net axi_pwm_generator_1_pwm_out [get_bd_ports led6_g] [get_bd_pins axi_pwm_generator_1/pwm_out]
+  connect_bd_net -net axi_pwm_generator_2_pwm_out [get_bd_ports led6_b] [get_bd_pins axi_pwm_generator_2/pwm_out]
+  connect_bd_net -net processing_system7_0_FCLK_CLK0 [get_bd_pins axi_pwm_generator_0/s00_axi_aclk] [get_bd_pins axi_pwm_generator_1/s00_axi_aclk] [get_bd_pins axi_pwm_generator_2/s00_axi_aclk] [get_bd_pins btn_gpio_0/s_axi_aclk] [get_bd_pins led_gpio_1/s_axi_aclk] [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins ps7_0_axi_periph/ACLK] [get_bd_pins ps7_0_axi_periph/M00_ACLK] [get_bd_pins ps7_0_axi_periph/M01_ACLK] [get_bd_pins ps7_0_axi_periph/M02_ACLK] [get_bd_pins ps7_0_axi_periph/M03_ACLK] [get_bd_pins ps7_0_axi_periph/M04_ACLK] [get_bd_pins ps7_0_axi_periph/S00_ACLK] [get_bd_pins rst_ps7_0_50M/slowest_sync_clk] [get_bd_pins system_ila_0/clk]
   connect_bd_net -net processing_system7_0_FCLK_RESET0_N [get_bd_pins processing_system7_0/FCLK_RESET0_N] [get_bd_pins rst_ps7_0_50M/ext_reset_in]
-  connect_bd_net -net rst_ps7_0_50M_peripheral_aresetn [get_bd_pins axi_pwm_generator_0/s00_axi_aresetn] [get_bd_pins btn_gpio_0/s_axi_aresetn] [get_bd_pins led_gpio_1/s_axi_aresetn] [get_bd_pins ps7_0_axi_periph/ARESETN] [get_bd_pins ps7_0_axi_periph/M00_ARESETN] [get_bd_pins ps7_0_axi_periph/M01_ARESETN] [get_bd_pins ps7_0_axi_periph/M02_ARESETN] [get_bd_pins ps7_0_axi_periph/S00_ARESETN] [get_bd_pins rst_ps7_0_50M/peripheral_aresetn] [get_bd_pins system_ila_0/resetn]
+  connect_bd_net -net rst_ps7_0_50M_peripheral_aresetn [get_bd_pins axi_pwm_generator_0/s00_axi_aresetn] [get_bd_pins axi_pwm_generator_1/s00_axi_aresetn] [get_bd_pins axi_pwm_generator_2/s00_axi_aresetn] [get_bd_pins btn_gpio_0/s_axi_aresetn] [get_bd_pins led_gpio_1/s_axi_aresetn] [get_bd_pins ps7_0_axi_periph/ARESETN] [get_bd_pins ps7_0_axi_periph/M00_ARESETN] [get_bd_pins ps7_0_axi_periph/M01_ARESETN] [get_bd_pins ps7_0_axi_periph/M02_ARESETN] [get_bd_pins ps7_0_axi_periph/M03_ARESETN] [get_bd_pins ps7_0_axi_periph/M04_ARESETN] [get_bd_pins ps7_0_axi_periph/S00_ARESETN] [get_bd_pins rst_ps7_0_50M/peripheral_aresetn] [get_bd_pins system_ila_0/resetn]
 
   # Create address segments
   assign_bd_address -offset 0x41200000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs btn_gpio_0/S_AXI/Reg] -force
   assign_bd_address -offset 0x41210000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs led_gpio_1/S_AXI/Reg] -force
   assign_bd_address -offset 0x43C00000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs axi_pwm_generator_0/S00_AXI/S00_AXI_reg] -force
+  assign_bd_address -offset 0x43C10000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs axi_pwm_generator_1/S00_AXI/S00_AXI_reg] -force
+  assign_bd_address -offset 0x43C20000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs axi_pwm_generator_2/S00_AXI/S00_AXI_reg] -force
 
 
   # Restore current instance
