@@ -55,7 +55,13 @@ architecture arch_imp of axi_pwm_generator_v1_0 is
 		C_S_AXI_ADDR_WIDTH	: integer	:= 4
 		);
 		port (
-		
+		        xReset      : out std_logic; 
+
+        xEnable     : out std_logic; 
+
+        xNfckpwm    : out std_logic_vector(7 downto 0); 
+
+        xDuty       : out std_logic_vector(7 downto 0); 
 		S_AXI_ACLK	: in std_logic;
 		S_AXI_ARESETN	: in std_logic;
 		S_AXI_AWADDR	: in std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);
@@ -93,6 +99,10 @@ axi_pwm_generator_v1_0_S00_AXI_inst : axi_pwm_generator_v1_0_S00_AXI
 	)
 	port map (
 	   
+	    xReset=> xReset, --to do
+	    xEnable=>xEnable, --to do
+	    xNfckpwm=>xNfckpwm,
+	    XDuty=>XDuty,
 		S_AXI_ACLK	=> s00_axi_aclk,
 		S_AXI_ARESETN	=> s00_axi_aresetn,
 		S_AXI_AWADDR	=> s00_axi_awaddr,
