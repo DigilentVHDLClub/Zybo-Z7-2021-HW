@@ -80,12 +80,13 @@ begin
         else cntPWM <= cntPWM + 1;
         end if;
         if cntPWM < duty then
-            pwm_temp <= "1";
+            pwm_out <= "1";
         else
-            pwm_temp <= "0";
+            pwm_out <= "0";
         end if;
     end if;
 end process;
+
 
 
 end Behavioral;
