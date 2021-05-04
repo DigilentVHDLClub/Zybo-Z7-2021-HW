@@ -124,7 +124,10 @@ set bCheckIPsPassed 1
 set bCheckIPs 1
 if { $bCheckIPs == 1 } {
    set list_check_ips "\ 
+<<<<<<< HEAD
 xilinx.com:user:axi_pwm_generator:1.0\
+=======
+>>>>>>> 3fd618bd81bf242fa0ccc6737102a333d57b0f3c
 xilinx.com:ip:axi_gpio:2.0\
 xilinx.com:ip:processing_system7:5.5\
 xilinx.com:ip:proc_sys_reset:5.0\
@@ -204,14 +207,21 @@ proc create_root_design { parentCell } {
 
 
   # Create ports
+<<<<<<< HEAD
   set led6_red [ create_bd_port -dir O -from 0 -to 0 led6_red ]
 
   # Create instance: axi_pwm_generator_0, and set properties
   set axi_pwm_generator_0 [ create_bd_cell -type ip -vlnv xilinx.com:user:axi_pwm_generator:1.0 axi_pwm_generator_0 ]
+=======
+>>>>>>> 3fd618bd81bf242fa0ccc6737102a333d57b0f3c
 
   # Create instance: btn_sw_gpio, and set properties
   set btn_sw_gpio [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 btn_sw_gpio ]
   set_property -dict [ list \
+<<<<<<< HEAD
+=======
+   CONFIG.C_IS_DUAL {1} \
+>>>>>>> 3fd618bd81bf242fa0ccc6737102a333d57b0f3c
    CONFIG.GPIO2_BOARD_INTERFACE {sws_4bits} \
    CONFIG.GPIO_BOARD_INTERFACE {btns_4bits} \
    CONFIG.USE_BOARD_FLOW {true} \
@@ -702,7 +712,11 @@ proc create_root_design { parentCell } {
   # Create instance: ps7_0_axi_periph, and set properties
   set ps7_0_axi_periph [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 ps7_0_axi_periph ]
   set_property -dict [ list \
+<<<<<<< HEAD
    CONFIG.NUM_MI {3} \
+=======
+   CONFIG.NUM_MI {2} \
+>>>>>>> 3fd618bd81bf242fa0ccc6737102a333d57b0f3c
  ] $ps7_0_axi_periph
 
   # Create instance: rst_ps7_0_50M, and set properties
@@ -738,6 +752,7 @@ proc create_root_design { parentCell } {
 connect_bd_intf_net -intf_net [get_bd_intf_nets ps7_0_axi_periph_M00_AXI] [get_bd_intf_pins ps7_0_axi_periph/M00_AXI] [get_bd_intf_pins system_ila_0/SLOT_0_AXI]
   set_property HDL_ATTRIBUTE.DEBUG {true} [get_bd_intf_nets ps7_0_axi_periph_M00_AXI]
   connect_bd_intf_net -intf_net ps7_0_axi_periph_M01_AXI [get_bd_intf_pins btn_sw_gpio/S_AXI] [get_bd_intf_pins ps7_0_axi_periph/M01_AXI]
+<<<<<<< HEAD
   connect_bd_intf_net -intf_net ps7_0_axi_periph_M02_AXI [get_bd_intf_pins axi_pwm_generator_0/S00_AXI] [get_bd_intf_pins ps7_0_axi_periph/M02_AXI]
 
   # Create port connections
@@ -750,6 +765,17 @@ connect_bd_intf_net -intf_net [get_bd_intf_nets ps7_0_axi_periph_M00_AXI] [get_b
   assign_bd_address -offset 0x43C00000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs axi_pwm_generator_0/S00_AXI/S00_AXI_reg] -force
   assign_bd_address -offset 0x41210000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs btn_sw_gpio/S_AXI/Reg] -force
   assign_bd_address -offset 0x41200000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs led_gpio/S_AXI/Reg] -force
+=======
+
+  # Create port connections
+  connect_bd_net -net processing_system7_0_FCLK_CLK0 [get_bd_pins btn_sw_gpio/s_axi_aclk] [get_bd_pins led_gpio/s_axi_aclk] [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins ps7_0_axi_periph/ACLK] [get_bd_pins ps7_0_axi_periph/M00_ACLK] [get_bd_pins ps7_0_axi_periph/M01_ACLK] [get_bd_pins ps7_0_axi_periph/S00_ACLK] [get_bd_pins rst_ps7_0_50M/slowest_sync_clk] [get_bd_pins system_ila_0/clk]
+  connect_bd_net -net processing_system7_0_FCLK_RESET0_N [get_bd_pins processing_system7_0/FCLK_RESET0_N] [get_bd_pins rst_ps7_0_50M/ext_reset_in]
+  connect_bd_net -net rst_ps7_0_50M_peripheral_aresetn [get_bd_pins btn_sw_gpio/s_axi_aresetn] [get_bd_pins led_gpio/s_axi_aresetn] [get_bd_pins ps7_0_axi_periph/ARESETN] [get_bd_pins ps7_0_axi_periph/M00_ARESETN] [get_bd_pins ps7_0_axi_periph/M01_ARESETN] [get_bd_pins ps7_0_axi_periph/S00_ARESETN] [get_bd_pins rst_ps7_0_50M/peripheral_aresetn] [get_bd_pins system_ila_0/resetn]
+
+  # Create address segments
+  assign_bd_address -offset 0x41200000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs led_gpio/S_AXI/Reg] -force
+  assign_bd_address -offset 0x41210000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs btn_sw_gpio/S_AXI/Reg] -force
+>>>>>>> 3fd618bd81bf242fa0ccc6737102a333d57b0f3c
 
 
   # Restore current instance
